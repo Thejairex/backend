@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -10,7 +12,40 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, Notifiable, HasUuids;
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function raffles()
+    {
+        return $this->hasMany(Raffle::class, 'id_user_creator');
+    }
+
+    public function purchases()
+    {
+        return $this->hasMany(Purchase::class, 'id_user');
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'id_user');
+    }
+
+    public function prizes()
+    {
+        return $this->hasMany(Prize::class, 'id_user_winner');
+    }
+
+
+
+    public function user_config()
+    {
+        return $this->belongsTo(UserConfig::class, 'id_user_config');
+    }
+
 
     /**
      * The attributes that are mass assignable.
@@ -19,8 +54,19 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'lastname',
+        'username',
         'email',
         'password',
+        'phone',
+        'image',
+        'id_country',
+        'created_at',
+        'updated_at',
+        'birthdate',
+        'banned',
+        'id_user_config',
+        'type'
     ];
 
     /**
