@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_configs', function (Blueprint $table) {
-            $table->ulid('id');
+            $table->ulid('id')->primary();
             $table->timestamps();
             $table->boolean('receive_email_notifications')->default(true);
             $table->boolean('receive_web_notifications')->default(true);

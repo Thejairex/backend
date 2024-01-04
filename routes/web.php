@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CoinBaseController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\OAuthMercadoPagoController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\SuscriptionPaymentController;
 use App\Http\Controllers\TicketController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+
 use Inertia\Inertia;
 
 /*

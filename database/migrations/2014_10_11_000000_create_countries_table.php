@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('countries', function (Blueprint $table) {
-            $table->id('id')->primary();
+            $table->id();
             $table->string("iso", 2);
             $table->string('name');
             $table->string("nicename");
-            $table->string("iso3", 3);
+            $table->string("iso3", 3)->nullable();
         });
     }
 

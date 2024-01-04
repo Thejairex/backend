@@ -1,3 +1,4 @@
+import { Input } from '@chakra-ui/react';
 import { forwardRef, useEffect, useRef } from 'react';
 
 export default forwardRef(function TextInput({ type = 'text', className = '', isFocused = false, ...props }, ref) {
@@ -9,7 +10,7 @@ export default forwardRef(function TextInput({ type = 'text', className = '', is
         }
     }, []);
 
-    return (
+    /* return (
         <input
             {...props}
             type={type}
@@ -19,5 +20,13 @@ export default forwardRef(function TextInput({ type = 'text', className = '', is
             }
             ref={input}
         />
-    );
+    ); */
+    return (
+        <Input
+            {...props}
+            type={type}
+            className={className}
+            ref={input}
+        />
+    )
 });

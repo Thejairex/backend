@@ -1,5 +1,13 @@
-export default function PrimaryButton({ className = '', disabled, children, ...props }) {
-    return (
+import { Button } from "@chakra-ui/react";
+
+export default function PrimaryButton({
+    className = "",
+    disabled,
+    children,
+    type = "submit",
+    ...props
+}) {
+    /* return (
         <button
             {...props}
             className={
@@ -11,5 +19,18 @@ export default function PrimaryButton({ className = '', disabled, children, ...p
         >
             {children}
         </button>
+    ); */
+    return (
+        <Button
+            {...props}
+            className={className}
+            disabled={disabled}
+            colorScheme="blue"
+            textTransform="uppercase"
+            fontSize="small"
+            type={type}
+        >
+            {children}
+        </Button>
     );
 }

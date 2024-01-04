@@ -24,7 +24,7 @@ return new class extends Migration
             $table->foreignId("id_country")->nullable()->constrained("countries");
             $table->date("birthdate")->nullable();
             $table->boolean("banned")->default(false);
-            $table->foreignUlid('id_user_config')->constrained('user_configs');
+            $table->foreignUlid('id_user_config')->constrained('user_configs', 'id');
             $table->enum('type', ['administrator', 'simple'])->default('simple');
             $table->rememberToken();
             $table->timestamps();

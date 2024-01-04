@@ -1,125 +1,357 @@
-import { useState } from 'react';
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link } from '@inertiajs/react';
+import { useEffect, useState } from "react";
+import ApplicationLogo from "@/Components/ApplicationLogo";
+import Dropdown from "@/Components/Dropdown";
+import NavLink from "@/Components/NavLink";
+import { FaRegBell } from "react-icons/fa6";
+import { Link, router } from "@inertiajs/react";
+import {
+    Box,
+    Container,
+    Flex,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    MenuItemOption,
+    MenuGroup,
+    MenuOptionGroup,
+    MenuDivider,
+    Button,
+    Avatar,
+    Text,
+} from "@chakra-ui/react";
+import { motion } from "framer-motion";
 
-export default function Authenticated({ user, header, children }) {
-    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+export default function Authenticated({ user, header, children, props = {}, containerProps = {} }) {
+    const [showingNavigationDropdown, setShowingNavigationDropdown] =
+        useState(false);
+
+    const [links] = useState([
+        {
+            href: route("dashboard"),
+            active: route().current("dashboard"),
+            label: "Dashboard",
+        },
+        {
+            href: route("raffles.index"),
+            active:
+                route().current("raffles.index") ||
+                route().current("raffles.show"),
+            label: "Mis Rifas",
+        },
+        {
+            href: route("purchases.index"),
+            active:
+                route().current("purchases.index") ||
+                route().current("purchases.show"),
+            label: "Mis Compras",
+        },
+    ]);
+
+    useEffect(() => {
+        console.log(user.unreadNotifications);
+    }, [])
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="bg-white border-b border-gray-100">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex">
-                            <div className="shrink-0 flex items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                </Link>
-                            </div>
-
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink href={route('dashboard')} active={route().current('dashboard')}>
-                                    Dashboard
-                                </NavLink>
-                            </div>
-                        </div>
-
-                        <div className="hidden sm:flex sm:items-center sm:ms-6">
-                            <div className="ms-3 relative">
-                                <Dropdown>
-                                    <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
+        <Box pos="relative" minH="100vh" bg="blue.50" {...containerProps}>
+            <Box
+                bg="white"
+                maxH="24"
+                borderBottom="1px solid var(--chakra-colors-gray-400)"
+                py="4"
+            >
+                <Container maxW="container.xl">
+                    <Flex justify="space-between" align="center">
+                        <Flex as={motion.div} layout align="center" gap="8">
+                            <Link href={route("dashboard")}>
+                                <ApplicationLogo className="w-16 h-16" />
+                            </Link>
+                            {links.map((link) => (
+                                <Button
+                                    as={Link}
+                                    pos="relative"
+                                    variant="link"
+                                    h="12"
+                                    key={link.href}
+                                    href={link.href}
+                                    isActive={link.active}
+                                    _active={{ color: "blue.500" }}
+                                    _focus={{ outline: "none" }}
+                                    _hover={{
+                                        color: "blue.400",
+                                        _before: {
+                                            opacity: 1,
+                                            transform: "scaleX(0.5)",
+                                        },
+                                        _after: {
+                                            opacity: 1,
+                                            transform: "scaleX(0.5)",
+                                        },
+                                    }}
+                                    _before={{
+                                        content: '""',
+                                        pos: "absolute",
+                                        bottom: "0",
+                                        left: "0",
+                                        w: "full",
+                                        h: "2px",
+                                        bg: "blue.500",
+                                        transition: "all .2s ease-in-out",
+                                        opacity: "0",
+                                        transform: "scaleX(0)",
+                                    }}
+                                    _after={{
+                                        content: '""',
+                                        pos: "absolute",
+                                        top: "0",
+                                        left: "0",
+                                        w: "full",
+                                        h: "2px",
+                                        bg: "blue.500",
+                                        transition: "all .2s ease-in-out",
+                                        opacity: "0",
+                                        transform: "scaleX(0)",
+                                    }}
+                                >
+                                    {link.label}
+                                    {link.active && (
+                                        <Box
+                                            as={motion.div}
+                                            pos="absolute"
+                                            bottom="0"
+                                            h="2px"
+                                            w="full"
+                                            layoutId="underline"
+                                            bg="blue.500"
+                                        />
+                                    )}
+                                    {link.active && (
+                                        <Box
+                                            as={motion.div}
+                                            pos="absolute"
+                                            top="0"
+                                            h="2px"
+                                            w="full"
+                                            layoutId="supraline"
+                                            exit={{ opacity: 0 }}
+                                            bg="blue.500"
+                                        />
+                                    )}
+                                </Button>
+                            ))}
+                        </Flex>
+                        <Flex direction="row" align="center" gap="4">
+                            <Menu>
+                                <MenuButton
+                                    as={Button}
+                                    variant="link"
+                                    px="2"
+                                    isActive={route().current(
+                                        "notifications.index"
+                                    )}
+                                    _before={{
+                                        content: '""',
+                                        pos: "absolute",
+                                        top: "0",
+                                        right: "0",
+                                        h: "full",
+                                        w: "2px",
+                                        bg: "blue.500",
+                                        transition: "all .2s ease-in-out",
+                                        opacity: "0",
+                                        transform: "scaleY(0)",
+                                    }}
+                                    _hover={{
+                                        _before: {
+                                            opacity: 1,
+                                            transform: "scaleY(1)",
+                                        },
+                                    }}
+                                    _active={{
+                                        _before: {
+                                            opacity: 1,
+                                            transform: "scaleY(1)",
+                                        },
+                                    }}
+                                >
+                                    <Flex align="flex-" justify="flex-start">
+                                        <FaRegBell />
+                                        {user?.unreadNotifications?.length >
+                                            0 && (
+                                            <Box
+                                                rounded="full"
+                                                bg="red.500"
+                                                w="2"
+                                                h="2"
+                                                marginLeft="-2"
+                                            />
+                                        )}
+                                    </Flex>
+                                </MenuButton>
+                                <MenuList zIndex="2">
+                                    <MenuItem
+                                        as={Link}
+                                        href={route("notifications.index")}
+                                    >
+                                        Ver todas
+                                    </MenuItem>
+                                    <MenuDivider />
+                                    {user?.unreadNotifications?.map(
+                                        (notification) => (
+                                            <MenuItem
+                                                as={Link}
+                                                href={route(
+                                                    "notifications.show",
+                                                    notification?.id
+                                                )}
+                                                key={notification?.id}
+                                                borderBlock="1px solid var(--chakra-colors-gray-400)"
                                             >
-                                                {user.name}
-
-                                                <svg
-                                                    className="ms-2 -me-0.5 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
+                                                <Flex
+                                                    direction="column"
+                                                    gap="2"
                                                 >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </Dropdown.Trigger>
-
-                                    <Dropdown.Content>
-                                        <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
-                                        <Dropdown.Link href={route('logout')} method="post" as="button">
-                                            Log Out
-                                        </Dropdown.Link>
-                                    </Dropdown.Content>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <div className="-me-2 flex items-center sm:hidden">
-                            <button
-                                onClick={() => setShowingNavigationDropdown((previousState) => !previousState)}
-                                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out"
-                            >
-                                <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path
-                                        className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
-                    <div className="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <div className="pt-4 pb-1 border-t border-gray-200">
-                        <div className="px-4">
-                            <div className="font-medium text-base text-gray-800">{user.name}</div>
-                            <div className="font-medium text-sm text-gray-500">{user.email}</div>
-                        </div>
-
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>Profile</ResponsiveNavLink>
-                            <ResponsiveNavLink method="post" href={route('logout')} as="button">
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            {header && (
-                <header className="bg-white shadow">
-                    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
-                </header>
-            )}
-
-            <main>{children}</main>
-        </div>
+                                                    <Text
+                                                        fontSize="md"
+                                                        fontWeight="semibold"
+                                                    >
+                                                        {
+                                                            notification?.data
+                                                                ?.title
+                                                        }
+                                                    </Text>
+                                                    <Text
+                                                        fontSize="sm"
+                                                        fontWeight="normal"
+                                                    >
+                                                        {
+                                                            notification?.data
+                                                                ?.message
+                                                        }
+                                                    </Text>
+                                                </Flex>
+                                            </MenuItem>
+                                        )
+                                    )}
+                                    {user?.unreadNotifications?.length ===
+                                        0 && (
+                                        <MenuItem>
+                                            <Text
+                                                fontSize="md"
+                                                fontWeight="semibold"
+                                            >
+                                                No tienes notificaciones
+                                            </Text>
+                                        </MenuItem>
+                                    )}
+                                    {user?.unreadNotifications?.length > 0 && (
+                                        <>
+                                            <MenuDivider />
+                                            <MenuItem
+                                                as={Link}
+                                                href={route(
+                                                    "notifications.markAsReadAll"
+                                                )}
+                                                method="post"
+                                            >
+                                                Marcar como leídas
+                                            </MenuItem>
+                                        </>
+                                    )}
+                                </MenuList>
+                            </Menu>
+                            <Menu>
+                                <MenuButton
+                                    as={Button}
+                                    variant="link"
+                                    px="2"
+                                    isActive={route().current("profile.edit")}
+                                    _before={{
+                                        content: '""',
+                                        pos: "absolute",
+                                        top: "0",
+                                        right: "0",
+                                        h: "full",
+                                        w: "2px",
+                                        bg: "blue.500",
+                                        transition: "all .2s ease-in-out",
+                                        opacity: "0",
+                                        transform: "scaleY(0)",
+                                    }}
+                                    _hover={{
+                                        _before: {
+                                            opacity: 1,
+                                            transform: "scaleY(1)",
+                                        },
+                                    }}
+                                    _active={{
+                                        _before: {
+                                            opacity: 1,
+                                            transform: "scaleY(1)",
+                                        },
+                                    }}
+                                >
+                                    <Flex
+                                        align="center"
+                                        justify="center"
+                                        gap="2"
+                                    >
+                                        <Text
+                                            fontSize="sm"
+                                            fontWeight="semibold"
+                                        >
+                                            {user.username}
+                                        </Text>
+                                        <Avatar src={user.image} size="sm" />
+                                    </Flex>
+                                </MenuButton>
+                                <MenuList zIndex="2">
+                                    <MenuItem
+                                        as={Link}
+                                        href={route("profile.edit", user.id)}
+                                    >
+                                        Perfil
+                                    </MenuItem>
+                                    <MenuItem
+                                        onClick={() => router.visit(route("logout"), {method: 'post'})}
+                                    >
+                                        Cerrar Sesión
+                                    </MenuItem>
+                                </MenuList>
+                            </Menu>
+                        </Flex>
+                    </Flex>
+                </Container>
+            </Box>
+            <Box
+                bg="white"
+                borderBottom="1px solid var(--chakra-colors-gray-400)"
+                py="4"
+                pos="sticky"
+                top="0"
+                zIndex="1"
+            >
+                <Container maxW="container.xl">{header}</Container>
+            </Box>
+            <Box as='main' className="py-4" {...props} >{children}</Box>
+            <Box h='24' />
+            <Box
+                as="footer"
+                pos="absolute"
+                bottom="0"
+                w="full"
+                h='24'
+                bg="white"
+                borderTop="1px solid var(--chakra-colors-gray-400)"
+            >
+                <Container maxW="container.xl" h='full'>
+                    <Flex justify="space-around" align="center" py="4" h='full'>
+                        <Text fontSize="sm" color="gray.500">
+                            &copy; 2024 RifaYA Inc. All rights reserved.
+                        </Text>
+                    </Flex>
+                </Container>
+            </Box>
+        </Box>
     );
 }

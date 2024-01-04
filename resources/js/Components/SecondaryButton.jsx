@@ -1,5 +1,7 @@
-export default function SecondaryButton({ type = 'button', className = '', disabled, children, ...props }) {
-    return (
+import { Button } from "@chakra-ui/react";
+
+export default function SecondaryButton({ type = 'button', variant = 'outline', className = '', disabled, children, ...props }) {
+    /* return (
         <button
             {...props}
             type={type}
@@ -12,5 +14,20 @@ export default function SecondaryButton({ type = 'button', className = '', disab
         >
             {children}
         </button>
-    );
+    ); */
+    
+    return (
+        <Button
+            {...props}
+            type={type}
+            variant={variant}
+            className={className}
+            disabled={disabled}
+            colorScheme="gray"
+            textTransform='uppercase'
+            fontSize='small'
+        >
+            {children}
+        </Button>
+    )
 }

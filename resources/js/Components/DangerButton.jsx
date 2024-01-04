@@ -1,5 +1,7 @@
+import { Button } from "@chakra-ui/react";
+
 export default function DangerButton({ className = '', disabled, children, ...props }) {
-    return (
+    /* return (
         <button
             {...props}
             className={
@@ -11,5 +13,18 @@ export default function DangerButton({ className = '', disabled, children, ...pr
         >
             {children}
         </button>
-    );
+    ); */
+    
+    return (
+        <Button
+            {...props}
+            className={className}
+            disabled={disabled}
+            colorScheme="red"
+            textTransform='uppercase'
+            fontSize='small'
+        >
+            {children}
+        </Button>
+    )
 }
