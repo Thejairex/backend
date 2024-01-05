@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use GuzzleHttp\Client;
-class CoinbaseService
+class CoinBaseService
 {
     protected $client;
 
@@ -14,7 +14,7 @@ class CoinbaseService
             'base_uri' => 'https://api.commerce.coinbase.com/',
             'headers' => [
                 'Content-Type' => 'application/json',
-                'X-CC-Api-Key' => env('COINBASE_API_KEY', ''),
+                'X-CC-Api-Key' => env('COINBASE_API', ''),
             ]
         ]);
     }
@@ -27,7 +27,22 @@ class CoinbaseService
         ]);
 
         // Devuelve JSON.
-        return json_decode($response->getBody(), true);
+        $reponseJson = json_decode($response->getBody(), true);
+
+        $url_checkout = $reponseJson['data']['hosted_url'];
+        $id_checkout = $reponseJson['data']['id'];
+
+        return ['url_checkout' => $url_checkout, 'id_checkout' => $id_checkout];
+    }
+
+    public function showCharge($chargeId){
+        // Realizar solicitud GET a la API de Coinbase Commerce para obtener detalles del cargo
+        $response = $this->client->get('/charges/' . $chargeId);
+
+        // Manejar la respuesta, por ejemplo, devolver el cuerpo JSON
+        
+        $responseJson = json_decode($response->getBody(), true);
+        return $responseJson['data']['timeline'][0]['status'];
     }
 
 }

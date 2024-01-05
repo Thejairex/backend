@@ -14,6 +14,10 @@ return [
     |
     */
 
+    'coinbase' => [
+        'webhook_secret' => env('COINBASE_WEBHOOK_SECRET'),
+    ],
+
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),

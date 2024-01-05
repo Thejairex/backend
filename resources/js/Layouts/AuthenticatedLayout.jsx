@@ -30,21 +30,36 @@ export default function Authenticated({ user, header, children, props = {}, cont
         {
             href: route("dashboard"),
             active: route().current("dashboard"),
-            label: "Dashboard",
+            label: "Inicio",
         },
         {
             href: route("raffles.index"),
             active:
                 route().current("raffles.index") ||
-                route().current("raffles.show"),
-            label: "Mis Rifas",
+                route().current("raffles.show") ||
+                route().current("raffles.create"),
+            label: "Sorteos",
+            items: [
+                {
+                    href: route("raffles.create"),
+                    active: route().current("raffles.create"),
+                    label: 'Crear Sorteos'
+                },
+                {
+                    href: route("raffles.index"),
+                    active:
+                        route().current("raffles.index") ||
+                        route().current("raffles.show"),
+                    label: "Sorteos disponibles",
+                }
+            ]
         },
         {
             href: route("purchases.index"),
             active:
                 route().current("purchases.index") ||
                 route().current("purchases.show"),
-            label: "Mis Compras",
+            label: "Pagos",
         },
     ]);
 
@@ -67,7 +82,107 @@ export default function Authenticated({ user, header, children, props = {}, cont
                                 <ApplicationLogo className="w-16 h-16" />
                             </Link>
                             {links.map((link) => (
-                                <Button
+                                <>{link?.items ? <Menu>
+                                    <MenuButton
+                                        as={Button}
+                                        pos="relative"
+                                        variant="link"
+                                        h="12"
+                                        key={link.href}
+                                        isActive={link.active}
+                                        _active={{ color: "blue.500" }}
+                                        _focus={{ outline: "none" }}
+                                        _hover={{
+                                            color: "blue.400",
+                                            _before: {
+                                                opacity: 1,
+                                                transform: "scaleX(0.5)",
+                                            },
+                                            _after: {
+                                                opacity: 1,
+                                                transform: "scaleX(0.5)",
+                                            },
+                                        }}
+                                        _before={{
+                                            content: '""',
+                                            pos: "absolute",
+                                            bottom: "0",
+                                            left: "0",
+                                            w: "full",
+                                            h: "2px",
+                                            bg: "blue.500",
+                                            transition: "all .2s ease-in-out",
+                                            opacity: "0",
+                                            transform: "scaleX(0)",
+                                        }}
+                                        _after={{
+                                            content: '""',
+                                            pos: "absolute",
+                                            top: "0",
+                                            left: "0",
+                                            w: "full",
+                                            h: "2px",
+                                            bg: "blue.500",
+                                            transition: "all .2s ease-in-out",
+                                            opacity: "0",
+                                            transform: "scaleX(0)",
+                                        }}>
+                                        {link.label}
+                                        {link.active && (
+                                            <Box
+                                                as={motion.div}
+                                                pos="absolute"
+                                                bottom="0"
+                                                h="2px"
+                                                w="full"
+                                                layoutId="underline"
+                                                bg="blue.500"
+                                            />
+                                        )}
+                                        {link.active && (
+                                            <Box
+                                                as={motion.div}
+                                                pos="absolute"
+                                                top="0"
+                                                h="2px"
+                                                w="full"
+                                                layoutId="supraline"
+                                                exit={{ opacity: 0 }}
+                                                bg="blue.500"
+                                            />
+                                        )}
+                                    </MenuButton>
+                                    <MenuList zIndex='2'>
+                                        {link.items.map(item => (
+                                            <MenuItem as={Button} variant='link' justifyContent='flex-start' rounded='0' fontWeight='medium' w='full' onClick={() => router.visit(item.href)} isActive={item.active} key={item.href}
+                                                _before={{
+                                                    content: '""',
+                                                    pos: "absolute",
+                                                    top: "0",
+                                                    right: "0",
+                                                    h: "full",
+                                                    w: "2px",
+                                                    bg: "blue.500",
+                                                    transition: "all .2s ease-in-out",
+                                                    opacity: "0",
+                                                    transform: "scaleY(0)",
+                                                }}
+                                                _hover={{
+                                                    _before: {
+                                                        opacity: 1,
+                                                        transform: "scaleY(1)",
+                                                    },
+                                                }}
+                                                _active={{
+                                                    _before: {
+                                                        opacity: 1,
+                                                        transform: "scaleY(1)",
+                                                    },
+                                                    color: 'blue.500'
+                                                }}>{item.label}</MenuItem>
+                                        ))}
+                                    </MenuList>
+                                </Menu> : <Button
                                     as={Link}
                                     pos="relative"
                                     variant="link"
@@ -137,7 +252,7 @@ export default function Authenticated({ user, header, children, props = {}, cont
                                             bg="blue.500"
                                         />
                                     )}
-                                </Button>
+                                </Button>}</>
                             ))}
                         </Flex>
                         <Flex direction="row" align="center" gap="4">
@@ -178,14 +293,14 @@ export default function Authenticated({ user, header, children, props = {}, cont
                                         <FaRegBell />
                                         {user?.unreadNotifications?.length >
                                             0 && (
-                                            <Box
-                                                rounded="full"
-                                                bg="red.500"
-                                                w="2"
-                                                h="2"
-                                                marginLeft="-2"
-                                            />
-                                        )}
+                                                <Box
+                                                    rounded="full"
+                                                    bg="red.500"
+                                                    w="2"
+                                                    h="2"
+                                                    marginLeft="-2"
+                                                />
+                                            )}
                                     </Flex>
                                 </MenuButton>
                                 <MenuList zIndex="2">
@@ -235,15 +350,15 @@ export default function Authenticated({ user, header, children, props = {}, cont
                                     )}
                                     {user?.unreadNotifications?.length ===
                                         0 && (
-                                        <MenuItem>
-                                            <Text
-                                                fontSize="md"
-                                                fontWeight="semibold"
-                                            >
-                                                No tienes notificaciones
-                                            </Text>
-                                        </MenuItem>
-                                    )}
+                                            <MenuItem>
+                                                <Text
+                                                    fontSize="md"
+                                                    fontWeight="semibold"
+                                                >
+                                                    No tienes notificaciones
+                                                </Text>
+                                            </MenuItem>
+                                        )}
                                     {user?.unreadNotifications?.length > 0 && (
                                         <>
                                             <MenuDivider />
@@ -313,7 +428,7 @@ export default function Authenticated({ user, header, children, props = {}, cont
                                         Perfil
                                     </MenuItem>
                                     <MenuItem
-                                        onClick={() => router.visit(route("logout"), {method: 'post'})}
+                                        onClick={() => router.visit(route("logout"), { method: 'post' })}
                                     >
                                         Cerrar Sesión
                                     </MenuItem>

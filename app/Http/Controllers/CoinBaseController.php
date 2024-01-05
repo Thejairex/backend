@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\CoinbaseService;
-
+use App\Services\CoinBaseService;
+use Inertia\Inertia;
 class CoinBaseController extends Controller
 {
     public function createCharge()
     {
-        $charge = new CoinbaseService();
+        $charge = new CoinBaseService();
 
         // Datos del cargo según la documentación de Coinbase Commerce
         $chargeData = [
@@ -28,9 +28,23 @@ class CoinBaseController extends Controller
            
         ];
 
-        # Envia los datos para crear un cargo y devuelve una respuesta HTTP
+        // Envia los datos para crear un cargo y devuelve un id y un checkout
         $response = $charge->createCharge($chargeData);
 
-        return response()->json($response);
+        return Inertia::render('Purchases/Index', [
+            'checkout'=> $response['url_checkout'],
+            'id_checkout'=> $response['id_checkout'],
+        ]);
+    }
+
+    // muestra es estado de cargo
+    public function showStatusCharge(Request $request){
+        $charge = new CoinbaseService();
+
+        $chargeStatus = $charge->showCharge($request);
+
+        return Inertia::render('Purchases/index', [
+            'status' => $chargeStatus,
+        ]);
     }
 }

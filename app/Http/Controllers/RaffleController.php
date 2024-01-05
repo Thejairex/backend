@@ -28,7 +28,7 @@ class RaffleController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $raffles = Raffle::with('user:id,username,image')->where('id_user_creator', $user->id)->where('status', 'active')->orderByDesc('created_at')->paginate(3);
+        $raffles = Raffle::with('user:id,username,image')->where('status', 'active')->orderByDesc('created_at')->paginate(3);
 
         return Inertia::render('Raffles/Index', [
             'raffles' => $raffles,
@@ -52,7 +52,6 @@ class RaffleController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        $members = User::where('id', $user->id)->first()->members()->get('id')->toArray();
 
         $validated = $request->validate([
             'id_user_creator' => 'required',
@@ -109,25 +108,12 @@ class RaffleController extends Controller
             'image_banner' => '/uploads/'. $validated['id_user_creator'] .'/raffles/'.$raffle->id_raffle.'/banner/'. $image_name_banner,
         ]);
 
-        if ($user->type === 'org') {
-            $tickets_per_member = floor($validated['quantity'] / count($members));
-            for ($i = 0; $i < $validated['quantity']; $i++) {
-                $mem_index = floor($i / $tickets_per_member);
-                Raffle::find($raffle->id)->tickets()->create([
-                    'id_raffle' => $raffle->id,
-                    'number' => $i,
-                    'id_user' => $validated['id_user_creator'],
-                    'id_member' => $members[$mem_index]['id']
-                ]);
-            }
-        } else {
-            for ($i = 0; $i < $validated['quantity']; $i++) {
-                Raffle::find($raffle->id)->tickets()->create([
-                    'id_raffle' => $raffle->id,
-                    'number' => $i,
-                    'id_user' => $validated['id_user_creator'],
-                ]);
-            }
+        for ($i = 0; $i < $validated['quantity']; $i++) {
+            Raffle::find($raffle->id)->tickets()->create([
+                'id_raffle' => $raffle->id,
+                'number' => $i,
+                'id_user' => $validated['id_user_creator'],
+            ]);
         }
 
         return redirect(route('prizes.create', $raffle));
@@ -142,7 +128,8 @@ class RaffleController extends Controller
 
         return Inertia::render('Raffles/Show', [
             'raffle' => $raffle->load(['user:id,username,image,type', 'prizes:id,id_raffle,title,description,quantity,position,image,tracking_code,id_user_winner']),
-            'tickets' => $raffle->tickets()->with(['member', 'purchase.user'])->get()
+            'tickets' => $raffle->tickets()->with(['purchase.user'])->get(),
+            'prizes' => $raffle->prizes()->with(['user'])->get()
         ]);
     }
 
@@ -154,8 +141,9 @@ class RaffleController extends Controller
         // $this->authorize('view', $raffle);
 
         return Inertia::render('Raffles/ShowInvited', [
-            'raffle' => $raffle->load(['user:id,username,image', 'tickets:id,id_raffle,number,id_user,id_purchase', 'tickets.purchase.user:username', 'tickets.member:email,name,lastname', 'prizes:id,id_raffle,title,description,quantity,position,image,tracking_code']),
-            'tickets' => $raffle->tickets()->with(['member', 'purchase.user'])->get()
+            'raffle' => $raffle->load(['user:id,username,image', 'tickets:id,id_raffle,number,id_user,id_purchase', 'tickets.purchase.user:username', 'prizes:id,id_raffle,title,description,quantity,position,image,tracking_code']),
+            'tickets' => $raffle->tickets()->with(['purchase.user'])->get(),
+            'prizes' => $raffle->prizes()->with(['user'])->get()
         ]);
     }
 

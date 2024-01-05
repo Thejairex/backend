@@ -31,14 +31,9 @@ class RafflePolicy
      */
     public function create(User $user)
     {
-        $final = $user->o_auth_mercado_pago()->exists()
+        $final = $user->type === 'administrator'
         ? Response::allow()
-        : Response::deny('You must have a Mercado Pago account to create raffles.');
-
-        $final = $user->type === 'org' && $user->members()->count() === 0
-        ? Response::deny('You must have one or more members')
-        : $final;
-
+        : Response::deny('NOT ADMIN');
 
         return $final;
     }

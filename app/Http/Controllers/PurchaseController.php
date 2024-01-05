@@ -3,19 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ControlPurchase;
-use App\Models\OAuthMercadoPago;
 use App\Models\Purchase;
 use App\Models\Raffle;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
-use Inertia\Response;
-use MercadoPago\Client\Payment\PaymentClient;
-use MercadoPago\Client\Preference\PreferenceClient;
-// SDK de Mercado Pago
-use MercadoPago\MercadoPagoConfig;
-use MercadoPago\Resources\Payment;
+use Illuminate\Support\Facades\Auth;
+use App\Services\CoinBaseService;
 
 class PurchaseController extends Controller
 {
@@ -83,7 +76,6 @@ class PurchaseController extends Controller
             'email' => $request->email,
             'mount' => $request->mount,
             'status' => 'pending',
-            'payment_method' => $request->payment_method,
         ]);
 
         $tickets_to_buy->each(function ($ticket) use ($purchase) {
@@ -122,7 +114,38 @@ class PurchaseController extends Controller
      * Display the specified resource.
      */
     public function show(Purchase $purchase)
-        {
+    {
+        $user = Auth::user();
+        $loaded_purchase = $purchase->load([
+            'tickets' => [
+                'raffle',
+            ]
+        ]);
+        $charge = new CoinBaseService();
+
+        // Datos del cargo según la documentación de Coinbase Commerce
+        $chargeData = [
+            'name' => 'Ticked de Sorteo',
+            'description' => 'Este ticket es el que permite que tengas las posibilidad de ganar un premio',
+            'pricing_type' => 'fixed_price',
+            'local_price' => [
+                'amount' => $loaded_purchase['mount'],
+                'currency' => 'USD',
+            ],
+            'metadata' => [
+                'customer_id' => $user->id,
+                'customer_name' => $user->username,
+                'purchase_id' => $loaded_purchase['id']
+            ]
+        ];
+
+        // Envia los datos para crear un cargo y devuelve un id y un checkout
+        $response = $charge->createCharge($chargeData);
+        return Inertia::render('Purchases/Show', [
+            'purchase' => $loaded_purchase,
+            'checkout' => $response['url_checkout'],
+            'id_checkout' => $response['id_checkout'],
+        ]);
     }
 
     /**
